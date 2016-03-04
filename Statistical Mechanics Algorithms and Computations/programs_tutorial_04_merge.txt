@@ -1,0 +1,203 @@
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\basic_use_random.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+print 'random seed'
+random.seed('MOOC-SMAC')
+for i in range(4):
+    print random.uniform(0.0, 1.0)
+print
+random.seed('MOOC-SMAC')
+for i in range(4):
+    print random.uniform(0.0, 10.0)
+print
+print 'random integers'
+random.seed(12315)
+for i in range(10):
+    print random.randint(0, 4)
+print 'random permuation of elements that are not all numbers'
+L = [1, 2, 'MOOC-SMAC', [1.1, 2.1]]
+for i in range(10): 
+    random.shuffle(L)
+    print L 
+    print random.choice(L)
+print 'read the documentation of the module "random" in Python'
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\gamma_transform.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+gamma = -0.5
+n_trials = 10000
+for trial in xrange(n_trials):
+    x = (random.uniform(0.0, 1.0)) ** (1.0 / (gamma + 1.0))
+    print x
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\gauss_transform.py@@@@@@@@@@@@@@@@@@@@@@@@import scipy.special, random, math
+
+n_trials = 100000
+for trial in xrange(n_trials):
+    Upsilon = random.uniform(0.0, 1.0)
+    x = math.sqrt(2.0) * scipy.special.erfinv(2.0 * Upsilon - 1.0)
+    print x
+
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\markov_gauss.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+x = 0.0
+delta = 0.5
+for k in xrange(100000):
+    x_new = x + random.uniform(-delta, delta)
+    if random.uniform(0.0, 1.0) <  \
+         math.exp (- x_new ** 2 / 2.0) / math.exp (- x ** 2 / 2.0): 
+        x = x_new 
+    print x
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\markov_inv_sqrt.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+x = 0.2
+delta = 0.5
+n_trials = 10000
+for trial in xrange(n_trials):
+    x_new = x + random.uniform(-delta, delta)
+    if x_new > 0.0 and x_new < 1.0:
+        if random.uniform(0.0, 1.0) <  math.sqrt(x) / math.sqrt(x_new): 
+            x = x_new 
+    print x
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\markov_inv_sqrt_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, pylab
+
+x = 0.2
+delta = 0.5
+data = []
+y_max = 0
+n_trials = 10000
+for k in xrange(n_trials):
+    x_new = x + random.uniform(-delta, delta)
+    if x_new > 0.0 and x_new < 1.0:
+        if random.uniform(0.0, 1.0) < math.sqrt(x) / math.sqrt(x_new): 
+            x = x_new 
+    if 1.0 / math.sqrt(x) > y_max: 
+         y_max =  1.0 / math.sqrt(x)
+         print y_max, x, k
+    data.append(x)
+
+pylab.hist(data, bins=100, normed='True')
+pylab.xlabel('$x$', fontsize=16)
+pylab.ylabel('$\pi(x)$', fontsize=16)
+x = [a / 100.0 for a in xrange(1, 101)]
+y = [0.5 / math.sqrt(a) for a in x]
+pylab.plot(x, y, linewidth=1.5, color='r')
+pylab.title('Theoretical distribution $\pi(x)={1}/{(2 \sqrt{x})}$ and normalized\
+    \n histogram for '+str(len(data))+' samples',fontsize=16)
+pylab.show()
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\naive_ran.py@@@@@@@@@@@@@@@@@@@@@@@@m = 134456
+n = 8121
+k = 28411
+idum = 1000
+for iteration in xrange(200000):
+    idum = (idum *  n + k) % m
+    ran = idum / float(m)
+    print idum, ran, iteration
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\reject_direct_gauss_cut.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+y_max = 1.0 / math.sqrt(2.0 * math.pi)
+x_cut = 5.0
+n_data = 1000
+n_accept = 0
+while n_accept < n_data:
+    y = random.uniform(0.0, y_max)
+    x = random.uniform(-x_cut, x_cut)
+    if y < math.exp( - x **2 / 2.0)/math.sqrt(2.0 * math.pi): 
+        n_accept += 1
+        print x
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\reject_inv_sqrt_cut.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, pylab
+
+y_max = 100.0
+x_cut = 1.0
+n_data = 10000
+data = []
+n_accept = 0
+while n_accept < n_data: 
+    y = random.uniform(0.0, y_max)
+    x = random.uniform(0.0, x_cut)
+    if y < 1.0 / (2.0 * math.sqrt(x)):
+        n_accept += 1
+        data.append(x)
+
+pylab.hist(data, bins=100, normed='True')
+x = [a / 100.0 for a in xrange(1, 100)]
+y = [1.0 / (2.0 * math.sqrt(a)) for a in x]
+pylab.plot(x, y, 'red', linewidth = 2)
+pylab.title('Theoretical distribution $\pi(x)={1}/{(2 \sqrt{x})}$ and normalized\
+    \n histogram for '+str(n_accept)+' accepted samples',fontsize=16)
+pylab.xlabel('$x$', fontsize=18)
+pylab.ylabel('$\pi(x)$', fontsize=18)
+pylab.show()
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\tower_discrete.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+# bisection search to find the bin corresponding to eta
+def bisection_search(eta, w_cumulative):
+    kmin = 0
+    kmax = len(w_cumulative)
+    while True:
+        k = int((kmin + kmax) / 2)
+        if w_cumulative[k] < eta:
+            kmin = k
+        elif w_cumulative[k - 1] > eta:
+            kmax = k
+        else:
+            return k - 1
+
+# sample an integer number according to weights
+def tower_sample(weights):
+    sum_w = sum(weights)
+    w_cumulative = [0.0]
+    for l in xrange(len(weights)):
+        w_cumulative.append(w_cumulative[l] + weights[l])
+    eta = random.random() * sum_w
+    sampled_choice = bisection_search(eta, w_cumulative)
+    return sampled_choice
+
+weights = [0.4, 0.3, 0.8, 0.1, 0.2]
+n_samples = 20
+for sample in xrange(n_samples):
+    print tower_sample(weights)
+
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_04\walker_test.py@@@@@@@@@@@@@@@@@@@@@@@@import random, pylab
+ 
+N = 5
+pi = [[1.1 / 5.0, 0], [1.9 / 5.0, 1], [0.5 / 5.0, 2], [1.25 / 5.0, 3], [0.25 / 5.0, 4]]
+x_val = [a[1] for a in pi]
+y_val = [a[0] for a in pi]
+pi_mean = sum(y_val) / float(N)
+long_s = []
+short_s = []
+for p in pi:
+    if p[0] > pi_mean:
+        long_s.append(p)
+    else:
+        short_s.append(p)
+table = []
+for k in range(N - 1):
+    e_plus = long_s.pop()
+    e_minus = short_s.pop()
+    table.append((e_minus[0], e_minus[1], e_plus[1]))
+    e_plus[0] = e_plus[0] - (pi_mean - e_minus[0])
+    if e_plus[0] < pi_mean:
+        short_s.append(e_plus)
+    else:
+        long_s.append(e_plus)
+if long_s != []: 
+    table.append((long_s[0][0], long_s[0][1], long_s[0][1]))
+else: 
+    table.append((short_s[0][0], short_s[0][1], short_s[0][1]))
+print table
+samples = []
+n_samples = 10000
+for k in xrange(n_samples):
+    Upsilon = random.uniform(0.0, pi_mean)
+    i = random.randint(0, N-1)
+    if Upsilon < table[i][0]:
+        samples.append(table[i][1])
+    else: samples.append(table[i][2])
+
+pylab.figure()
+pylab.hist(samples, bins=N, range=(-0.5, N-0.5), normed=True)
+pylab.plot(x_val, y_val,'ro', ms=8)
+pylab.title("Histogram using Walker's method for a discrete distribution\n\
+             on $N=$"+str(N)+" choices ("+str(n_samples)+" samples)",fontsize=14)
+pylab.xlabel('$k$',fontsize=20)
+pylab.ylabel('$\pi(k)$',fontsize=20)
+pylab.show()

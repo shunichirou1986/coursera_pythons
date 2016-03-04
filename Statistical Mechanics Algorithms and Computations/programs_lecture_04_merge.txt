@@ -1,0 +1,188 @@
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\direct_sphere_3d.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+nsamples = 100
+for sample in xrange(nsamples):
+    x, y, z = (random.gauss(0.0, 1.0), 
+               random.gauss(0.0, 1.0), 
+               random.gauss(0.0, 1.0))
+    length = random.uniform(0.0, 1.0) ** (1.0 / 3.0) \
+                    / math.sqrt(x ** 2 + y ** 2 + z ** 2) 
+    print x * length, y * length, z * length
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\direct_sphere_3d_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, pylab, mpl_toolkits.mplot3d
+
+x_list, y_list, z_list = [],[],[]
+nsamples = 200000
+for sample in xrange(nsamples):
+    x, y, z = random.gauss(0.0, 1.0), random.gauss(0.0, 1.0), random.gauss(0.0, 1.0)
+    length = random.uniform(0.0, 1.0) ** (1.0 / 3.0) / math.sqrt(x ** 2 + y ** 2 + z ** 2)
+    x, y, z = x * length, y * length, z * length
+    if z < 0.075 and z > -0.075 or z > 0.85 or z < -0.85:
+        x_list.append(x)
+        y_list.append(y)
+        z_list.append(z)
+# graphics output
+fig = pylab.figure()
+ax = fig.gca(projection='3d')
+ax.set_aspect('equal')
+pylab.title('Uniform sampling inside the sphere\n(only shown three intervals for z)')
+ax.set_xlabel('$x$', fontsize=14)
+ax.set_ylabel('$y$', fontsize=14)
+ax.set_zlabel('$z$', fontsize=14)
+pylab.plot(x_list, y_list, z_list, '.')
+pylab.show()
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\direct_surface.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+dimensions = 5
+nsamples = 20
+for sample in xrange(nsamples):
+    R = [random.gauss(0.0, 1.0) for d in xrange(dimensions)]
+    radius = math.sqrt(sum(x ** 2 for x in R))
+    print [x / radius for x in R]
+
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\direct_surface_3d.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+nsamples = 50
+for sample in xrange(nsamples):
+    x, y, z = (random.gauss(0.0, 1.0), 
+               random.gauss(0.0, 1.0), 
+               random.gauss(0.0, 1.0))
+    radius = math.sqrt(x ** 2 + y ** 2 + z ** 2)
+    print x / radius, y / radius, z / radius
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\direct_surface_3d_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, pylab, mpl_toolkits.mplot3d
+
+x_list, y_list, z_list = [],[],[]
+nsamples = 1000
+for sample in xrange(nsamples):
+    x, y, z = random.gauss(0.0, 1.0), random.gauss(0.0, 1.0), random.gauss(0.0, 1.0)
+    radius = math.sqrt(x ** 2 + y ** 2 + z ** 2)
+    x_list.append(x / radius)
+    y_list.append(y / radius)
+    z_list.append(z / radius)
+# graphics output
+fig = pylab.figure()
+ax = fig.gca(projection='3d')
+ax.set_aspect('equal')
+pylab.plot(x_list, y_list, z_list, '.')
+pylab.title('Uniform sampling of the sphere surface')
+ax.set_xlabel('$x$', fontsize=14)
+ax.set_ylabel('$y$', fontsize=14)
+ax.set_zlabel('$z$', fontsize=14)
+pylab.show()
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\gauss_2d.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+nsamples = 100
+for sample in range(nsamples):
+    x, y = random.gauss(0.0, 1.0), random.gauss(0.0, 1.0)
+    print x, y
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\gauss_2d_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, pylab
+
+nsamples = 10000000
+x_list, y_list = [], []
+for sample in range(nsamples):
+    x_list.append(random.gauss(0.0, 1.0))
+    y_list.append(random.gauss(0.0, 1.0))
+# begin graphics output
+pylab.plot(x_list, y_list, marker='.', linestyle='')
+pylab.title('Samples from the 2D Gaussian distribution')
+pylab.xlabel('$x$', fontsize=14)
+pylab.ylabel('$y$', fontsize=14)
+pylab.xlim(-4.0, 4.0)
+pylab.ylim(-4.0, 4.0)
+pylab.axes().set_aspect('equal') # set the aspect ratio of the plot
+pylab.savefig('plot-gauss_2d.png')
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\gauss_3d.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+nsamples = 100
+for sample in xrange(nsamples):
+    x, y, z = (random.gauss(0.0, 1.0),
+               random.gauss(0.0, 1.0),
+               random.gauss(0.0, 1.0))
+    print x, y, z
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\gauss_3d_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, pylab, mpl_toolkits.mplot3d
+
+x_list, y_list, z_list = [], [], []
+nsamples = 1000000
+for sample in xrange(nsamples):
+    x_list.append(random.gauss(0.0, 1.0))
+    y_list.append(random.gauss(0.0, 1.0))
+    z_list.append(random.gauss(0.0, 1.0))
+# begin graphics output
+fig = pylab.figure()
+ax = fig.gca(projection='3d')
+ax.set_aspect('equal') # set the aspect ratio of the plot
+pylab.plot(x_list, y_list, z_list, '.')
+pylab.title('Samples from the 3D gaussian distribution')
+ax.set_xlabel('$x$', fontsize=14)
+ax.set_ylabel('$y$', fontsize=14)
+ax.set_zlabel('$z$', fontsize=14)
+pylab.savefig('plot-gauss_3d.png')
+pylab.show()
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\gauss_test.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math 
+
+def gauss_test(sigma):
+    phi = random.uniform(0.0, 2.0 * math.pi)
+    Upsilon = random.uniform(0.0, 1.0)
+    Psi = - math.log(Upsilon)
+    r = sigma * math.sqrt(2.0 * Psi)
+    x = r * math.cos(phi)
+    y = r * math.sin(phi)
+    return [x, y]
+
+nsamples = 50
+for sample in range(nsamples):
+    [x, y] = gauss_test(1.0)
+    print x, y
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\gauss_test_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, pylab
+
+def gauss_test(sigma):
+    phi = random.uniform(0.0, 2.0 * math.pi)
+    Upsilon = random.uniform(0.0, 1.0)
+    Psi = - math.log(Upsilon)
+    r = sigma * math.sqrt(2.0 * Psi)
+    x = r * math.cos(phi)
+    y = r * math.sin(phi)
+    return [x, y]
+
+# exact distrubution:
+list_x = [i * 0.1 for i in xrange(-40, 40)]
+list_y = [math.exp(- x ** 2 / 2.0) / (math.sqrt(2.0 * math.pi)) for x in list_x]
+# sampled distribution:
+n_sampled_pairs = 5000
+data = []
+for sample in xrange(n_sampled_pairs):
+        data += gauss_test(1.0)
+# graphics output
+pylab.plot(list_x, list_y, color='k', label='exact')
+pylab.hist(data, bins=150, normed=True, color='r', histtype='step', label='sampled')
+pylab.legend()
+pylab.title('Sampling of the gaussian distribution\n(gauss_test_movie.py)')
+pylab.xlabel('$x$', fontsize=14)
+pylab.ylabel('$\pi(x)$', fontsize=14)
+pylab.savefig('plot-gauss_test.png')
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\naive_gauss.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+K = 10  # for each sample, we sum up K independent random variables
+sigma = math.sqrt(K / 12.0)
+nsamples = 100
+for sample in xrange(nsamples):
+    print sum(random.uniform(-0.5, 0.5) for i in xrange(K)) / sigma
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_04\naive_gauss_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, pylab
+
+# exact distrubution:
+list_x = [i * 0.1 for i in range(-40, 40)]
+list_y = [math.exp(- x ** 2 / 2.0) / (math.sqrt(2.0 * math.pi)) for x in list_x]
+pylab.plot(list_x, list_y, color='k', label='exact')
+# sampled distributions:
+nsamples = 2000000
+for K in [1, 2, 6]: 
+    print 'K = %i' % K
+    sigma = math.sqrt(K / 12.0)
+    data = []
+    for sample in xrange(nsamples):
+        data += [sum(random.uniform(-0.5, 0.5) for k in xrange(K)) / sigma]
+    pylab.hist(data, bins=200, normed=True, histtype='step', label='sampled (K=%i)' % K)
+pylab.legend()
+pylab.title('Sampling of the gaussian distribution\n(naive_gauss_movie.py)')
+pylab.xlabel('$x$', fontsize=14)
+pylab.ylabel('$\pi(x)$', fontsize=14)
+pylab.savefig('plot-naive_gauss.png')

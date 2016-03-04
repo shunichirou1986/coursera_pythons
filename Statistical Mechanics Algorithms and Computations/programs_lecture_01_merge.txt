@@ -1,0 +1,145 @@
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_01\direct_pi.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+n_trials = 4000
+n_hits = 0
+for iter in range(n_trials):
+    x, y = random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0)
+    if x**2 + y**2 < 1.0: 
+        n_hits += 1
+print 4.0 * n_hits / float(n_trials)
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_01\direct_pi_multirun.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+ 
+def direct_pi(N):
+    n_hits = 0
+    for i in range(N):
+        x, y = random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0)
+        if x ** 2 + y ** 2 < 1.0:
+            n_hits += 1
+    return n_hits
+ 
+n_runs = 1000
+n_trials = 4000
+for run in range(n_runs):
+    print 4.0 * direct_pi(n_trials) / float(n_trials)
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_01\markov_pi.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+x, y = 1.0, 1.0
+delta = 0.1
+n_trials = 4000
+n_hits = 0
+for i in range(n_trials):
+    del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+    if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+        x, y = x + del_x, y + del_y
+    if x**2 + y**2 < 1.0: n_hits += 1
+print 4.0 * n_hits / float(n_trials)
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_01\markov_pi_multirun.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+def markov_pi(N, delta): 
+    x, y = 1.0, 1.0
+    n_hits = 0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x**2 + y**2 < 1.0: n_hits += 1
+    return n_hits
+
+n_runs = 500
+n_trials = 10000
+delta = 0.1
+for run in range(n_runs):
+    print 4.0 * markov_pi(n_trials, delta) / float(n_trials)
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_01\markov_pi_multirun_homeworkmodified.py@@@@@@@@@@@@@@@@@@@@@@@@import random,math,pylab 
+
+def markov_pi(N, delta): 
+    x, y = 1.0, 1.0
+    # n_hits = 0
+    n_accept = 0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+            n_accept += 1
+        # if x**2 + y**2 < 1.0: n_hits += 1
+    return n_accept
+
+n_trials = 10000
+acceptance_ratio_list500 = []
+acceptance_ratio_list1000 = []
+delta_list = []
+
+n_runs = 500
+acceptance_ratio = 0
+delta = 0.1
+
+while delta < 5.0 :
+    for run in range(n_runs):
+        acceptance_ratio = markov_pi(n_trials, delta) / float(n_trials)
+        # print 4.0 * acceptance_ratio
+    acceptance_ratio_list500.append(acceptance_ratio)
+    delta_list.append(delta)
+    print acceptance_ratio
+    print delta
+    delta += 0.1
+
+
+n_runs = 1000
+acceptance_ratio = 0
+delta = 0.1
+while delta < 5.0 :
+    for run in range(n_runs):
+        acceptance_ratio = markov_pi(n_trials, delta) / float(n_trials)
+        # print 4.0 * acceptance_ratio
+    acceptance_ratio_list1000.append(acceptance_ratio)
+    #delta_list.append(delta)
+    print acceptance_ratio
+    print delta
+    delta += 0.1
+    
+pylab.plot(delta_list, acceptance_ratio_list500,  'o')
+
+pylab.plot(delta_list, acceptance_ratio_list1000,  'x')
+
+#pylab.gca().set_xscale('log')
+#pylab.gca().set_yscale('log')
+pylab.ylabel('acceptance_ratio')
+pylab.xlabel('$\delta$')
+pylab.title('acceptance_ratio vs delta n_runs=500&1000')
+pylab.savefig('markov_pi_multirun_nruns=500and1000.png')
+pylab.show()
+
+    
+    
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_01\pebble_basic.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+neighbor =  [[1, 3, 0, 0], [2, 4, 0, 1], [2, 5, 1, 2],
+             [4, 6, 3, 0], [5, 7, 3, 1], [5, 8, 4, 2],
+             [7, 6, 6, 3], [8, 7, 6, 4], [8, 8, 7, 5]]
+t_max = 4
+site = 8
+t = 0
+print site
+while t < t_max:
+    t += 1
+    site = neighbor[site][random.randint(0, 3)]
+    print site
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_01\pebble_basic_inhomogeneous.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+histo = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+neighbor =  [[1, 3, 0, 0], [2, 4, 0, 1], [2, 5, 1, 2],
+             [4, 6, 3, 0], [5, 7, 3, 1], [5, 8, 4, 2],
+             [7, 6, 6, 3], [8, 7, 6, 4], [8, 8, 7, 5]]
+weight = [3.0, 0.5, 1.0, 0.5, 1.0, 0.5, 2.0, 0.5, 1.0]
+pos = 8
+n_iter = 1000000
+for iter in range(n_iter):
+    new_pos = neighbor[pos][random.randint(0, 3)]
+    if random.random() < weight[new_pos] / weight[pos]:
+        pos = new_pos
+    histo[pos] += 1 
+
+norm = sum(weight)
+print 'comparison:  weight, histogram'
+for k in range(9): 
+    print 'site: ', k,' weight: ', weight[k], ' histo: ', norm * histo[k] / float(n_iter)

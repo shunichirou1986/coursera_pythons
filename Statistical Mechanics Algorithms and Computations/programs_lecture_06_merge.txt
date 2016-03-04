@@ -1,0 +1,183 @@
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_06\continuous_random_walk.py@@@@@@@@@@@@@@@@@@@@@@@@import math, random
+
+beta = 4.0
+N = 8
+sigma = math.sqrt(beta / N)
+x = [0.0]
+for k in range(N - 1):
+    x.append(random.gauss(x[-1], sigma))
+print x
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_06\levy_free_path.py@@@@@@@@@@@@@@@@@@@@@@@@import math, random
+
+beta = 1.0
+N = 10
+dtau = beta / N
+nsteps = 10                      # number of paths to be generated
+xstart, xend = 0.0, 1.0          # initial and final points
+for step in range(nsteps):
+    x = [xstart]
+    for k in range(1, N):        # loop over internal slices
+        dtau_prime = (N - k) * dtau
+        x_mean = (dtau_prime * x[k - 1] + dtau * xend) /(dtau + dtau_prime)
+        sigma = math.sqrt(1.0 / (1.0 / dtau + 1.0 / dtau_prime))
+        x.append(random.gauss(x_mean, sigma))
+    x.append(xend)
+    print x
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_06\levy_harmonic_path.py@@@@@@@@@@@@@@@@@@@@@@@@import math, random
+
+beta = 1.0
+N = 4
+dtau = beta / N
+xstart, xend = 0.0, 1.0
+x = [xstart]
+for k in range(1, N):
+    dtau_prime = (N - k) * dtau
+    Ups1 = 1.0 / math.tanh(dtau) + 1.0 / math.tanh(dtau_prime)
+    Ups2 = x[k - 1] / math.sinh(dtau) +xend / math.sinh(dtau_prime)
+    x.append(random.gauss(Ups2 / Ups1,1.0 / math.sqrt(Ups1)))
+x.append(xend)
+print x
+
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_06\levy_harmonic_path_3D.py@@@@@@@@@@@@@@@@@@@@@@@@import math, random
+
+def levy_harmonic_1d(start, end, dtau):
+    x = [start]
+    for k in range(1, N):
+        dtau_prime = (N - k) * dtau
+        Ups1 = 1.0 / math.tanh(dtau) + \
+               1.0 / math.tanh(dtau_prime)
+        Ups2 = x[k - 1] / math.sinh(dtau) + \
+               end / math.sinh(dtau_prime)
+        x.append(random.gauss(Ups2 / Ups1, \
+                 1.0 / math.sqrt(Ups1)))
+    x.append(end)
+    return x
+
+beta = 1.0
+N = 20
+dtau = beta / float(N)
+[xstart, ystart, zstart] = [1.0, -2.0, 1.5]
+[xend, yend, zend] = [-2.5, 0.0, -0.5]
+x = levy_harmonic_1d(xstart, xend, dtau)
+y = levy_harmonic_1d(ystart, yend, dtau)
+z = levy_harmonic_1d(zstart, zend, dtau)
+for i in range(N + 1):
+    print 'slice %2i:  ' % i, x[i], y[i], z[i]
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_06\levy_harmonic_path_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import math, random, pylab
+
+beta = 2.0
+N = 10
+dtau = beta / N
+nsteps = 5
+xstart, xend = 2.0, 1.0
+for step in range(nsteps):
+    x = [xstart]
+    for k in range(1, N):
+        dtau_prime = (N - k) * dtau
+        Ups1 = 1.0 / math.tanh(dtau) + \
+               1.0 / math.tanh(dtau_prime)
+        Ups2 = x[k - 1] / math.sinh(dtau) + \
+               xend / math.sinh(dtau_prime)
+        x.append(random.gauss(Ups2 / Ups1, \
+                 1.0 / math.sqrt(Ups1)))
+    x.append(xend)
+    # graphics
+    pylab.plot(x, [j * dtau for j in range(N + 1)], 'bo-')
+    pylab.xlabel('$x$', fontsize=18)
+    pylab.ylabel('$\\tau$', fontsize=18)
+    pylab.title('Harmonic path %i' % step)
+    pylab.xlim(-2.0, 4.0)
+    pylab.show()
+    pylab.close()
+
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_06\naive_harmonic_path.py@@@@@@@@@@@@@@@@@@@@@@@@import math, random
+
+def rho_free(x, y, beta):    # free off-diagonal density matrix
+    return math.exp(-(x - y) ** 2 / (2.0 * beta))
+
+beta = 4.0
+N = 8                        # number of slices
+dtau = beta / N
+delta = 1.0                  # maximum displacement of one bead
+n_steps = 20                 # number of Monte Carlo steps
+x = [0.0] * N                # initial path
+for step in xrange(n_steps):
+    k = random.randint(0, N - 1)                  # random slice
+    knext, kprev = (k + 1) % N, (k - 1) % N       # next/previous slices
+    x_new = x[k] + random.uniform(-delta, delta)  # new position at slice k
+    old_weight = (rho_free(x[knext], x[k], dtau) *
+                  rho_free(x[k], x[kprev], dtau) *
+                  math.exp(-0.5 * dtau * x[k] ** 2))
+    new_weight = (rho_free(x[knext], x_new, dtau) *
+                  rho_free(x_new, x[kprev], dtau) *
+                  math.exp(-0.5 * dtau * x_new ** 2))
+    if random.random() < new_weight / old_weight:
+        x[k] = x_new
+    print x
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_06\naive_path_slice.py@@@@@@@@@@@@@@@@@@@@@@@@import math, random
+
+def rho_free(x, y, beta):
+    return math.exp(-(x - y) ** 2 / (2.0 * beta))
+
+dtau_prime  = 0.1
+dtau_dprime = 0.2
+x_prime  = 0.0
+x_dprime = 1.0
+delta = 1.0
+n_steps = 100
+xk = 0.0
+for step in xrange(n_steps):
+    xk_new = xk + random.uniform(-delta, delta)
+    old_weight  = (rho_free(x_dprime, xk, dtau_dprime) *
+                   rho_free(xk, x_prime, dtau_prime))
+    new_weight  = (rho_free(x_dprime, xk_new, dtau_dprime) * 
+                   rho_free(xk_new, x_prime, dtau_prime))
+    if random.random() < new_weight / old_weight:
+        xk = xk_new
+    print xk
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_06\naive_path_slice_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import math, random, pylab
+
+def rho_free(x, y, beta):
+    return math.exp(-(x - y) ** 2 / (2.0 * beta))
+
+dtau_prime  = 0.1
+dtau_dprime = 0.2
+x_prime  = 0.0
+x_dprime = 1.0
+delta = 5.0                 # maximum displacement of xk
+n_steps = 5000000            # number of Monte Carlo steps
+data_hist = []
+xk = 0.0                    # initial value of xk
+for step in xrange(n_steps):
+    xk_new = xk + random.uniform(-delta, delta)
+    old_weight  = (rho_free(x_dprime, xk, dtau_dprime) *
+                   rho_free(xk, x_prime, dtau_prime))
+    new_weight  = (rho_free(x_dprime, xk_new, dtau_dprime) * 
+                   rho_free(xk_new, x_prime, dtau_prime))
+    if random.random() < new_weight / old_weight:
+        xk = xk_new
+    data_hist.append(xk)
+
+def pi_analytic(xk, x_prime, x_dprime, dtau_prime, dtau_dprime):
+    mean = (dtau_dprime * x_prime + dtau_prime * x_dprime) / (dtau_prime + dtau_dprime)
+    sigma = 1.0 / math.sqrt(1.0 / dtau_prime + 1.0 / dtau_dprime)
+    return math.exp(-(xk - mean) ** 2 / (2.0 * sigma ** 2)) / math.sqrt(2.0 * math.pi) / sigma
+
+pylab.title('Distribution on slice k', fontsize=18)
+histo, bin_edges, dummy = pylab.hist(data_hist, bins=100, normed=True)
+bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
+pylab.plot(bin_centers, [pi_analytic(x, x_prime, x_dprime, dtau_prime, dtau_dprime) for x in bin_centers], 'r-', lw=3)
+pylab.xlabel('$x_k$', fontsize=18)
+pylab.ylabel('$\pi(x_k)$', fontsize=18)
+pylab.savefig('plot-path_slice.png')
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_06\trivial_free_path.py@@@@@@@@@@@@@@@@@@@@@@@@import math, random
+
+beta = 1.0
+N = 8
+sigma = math.sqrt(beta / N)
+xend = 1.0
+Upsilon = [0.0]
+for k in range(N):
+    Upsilon.append(random.gauss(Upsilon[-1], sigma))
+x = [0.0] + [Upsilon[k] + (xend - Upsilon[-1]) *k / float(N) for k in range(1, N + 1)]
+print x

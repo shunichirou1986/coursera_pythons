@@ -1,0 +1,185 @@
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_05\free_periodic_complex_exp.py@@@@@@@@@@@@@@@@@@@@@@@@import math, cmath
+
+ntot = 21   # odd number
+beta = 1.0
+nx = 100
+L = 10.0
+x = [i * L / float(nx - 1) for i in range(nx)]
+rho_complex = []
+for i in range(nx):
+    rho_complex.append([sum(
+              math.exp(- 2.0 * beta * (math.pi * n / L) ** 2) *
+              cmath.exp(1j * 2.0 * n * math.pi * (x[i] - x[j]) / L) / L
+              for n in range(-(ntot - 1) / 2, (ntot + 1) / 2))
+              for j in range(nx)])
+rho_real = [[rho_complex[i][j].real for i in range(nx)] for j in range(nx)]
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_05\free_periodic_complex_exp_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import math, cmath, pylab
+
+ntot = 21   # odd number
+beta = 1.0
+nx = 100
+L = 10.0
+x = [i * L / float(nx - 1) for i in range(nx)]
+rho_complex = []
+for i in range(nx):
+    rho_complex.append([sum(
+              math.exp(- 2.0 * beta * (math.pi * n / L) ** 2) *
+              cmath.exp(1j * 2.0 * n * math.pi * (x[i] - x[j]) / L) / L
+              for n in range(-(ntot - 1) / 2, (ntot + 1) / 2))
+              for j in range(nx)])
+rho_real = [[rho_complex[i][j].real for i in range(nx)] for j in range(nx)]
+
+# graphics output
+pylab.imshow(rho_real, extent=[0.0, L, 0.0, L], origin='lower')
+pylab.colorbar()
+pylab.title('$\\beta$=%s (complex exp)' % beta)
+pylab.xlabel('$x$', fontsize=16)
+pylab.ylabel('$x\'$', fontsize=16)
+pylab.savefig('plot-periodic-complex.png')
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_05\free_periodic_sine_cosine.py@@@@@@@@@@@@@@@@@@@@@@@@import math
+
+# simmetric wavefunctions
+def psi_s(x, L, n):
+    return math.sqrt(2.0 / L) * math.cos(2.0 * n * math.pi * x / L)
+
+# antysimmetric wavefunctions
+def psi_a(x, L, n):
+    return math.sqrt(2.0 / L) * math.sin(2.0 * n * math.pi * x / L)
+
+ntot = 21     # odd number
+beta = 1.0
+nx = 100
+L = 10.0
+x = [i * L / float(nx - 1) for i in range(nx)]
+rho = []
+for i in range(nx):
+    rho.append([1.0 / L + sum(
+              math.exp(- beta * 2.0 * (math.pi * n / L) ** 2) *
+              (psi_s(x[i], L, n) * psi_s(x[j], L, n) + 
+              psi_a(x[i], L, n) * psi_a(x[j], L, n) )
+              for n in range(1, (ntot + 1) / 2))
+              for j in range(nx)])
+print rho@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_05\free_periodic_sine_cosine_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import math, pylab
+
+# simmetric wavefunctions
+def psi_s(x, L, n):
+    return math.sqrt(2.0 / L) * math.cos(2.0 * n * math.pi * x / L)
+
+# antysimmetric wavefunctions
+def psi_a(x, L, n):
+    return math.sqrt(2.0 / L) * math.sin(2.0 * n * math.pi * x / L)
+
+ntot = 21     # odd number
+beta = 3.0
+nx = 100
+L = 10.0
+x = [i * L / float(nx - 1) for i in range(nx)]
+rho = []
+for i in range(nx):
+    rho.append([1.0 / L + sum(math.exp(- beta * 2.0 * (math.pi * n / L) ** 2) *(psi_s(x[i], L, n) * psi_s(x[j], L, n) + psi_a(x[i], L, n) * psi_a(x[j], L, n) ) for n in range(1, (ntot + 1) / 2))for j in range(nx)])
+
+# graphics output
+pylab.imshow(rho, extent=[0.0, L, 0.0, L], origin='lower')
+pylab.colorbar()
+pylab.title('$\\beta$=%s (sine/cosine)' % beta)
+pylab.xlabel('$x$', fontsize=16)
+pylab.ylabel('$x\'$', fontsize=16)
+pylab.savefig('plot-periodic-sine_cosine.png')
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_05\harmonic_trotter_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import math, pylab
+
+# density matrix for a free particle (exact)
+def funct_rho_free(x, xp, beta):
+    return (math.exp(-(x - xp) ** 2 / (2.0 * beta)) /
+            math.sqrt(2.0 * math.pi * beta))
+
+beta = 0.1
+nx = 300
+L = 10.0
+x = [-L / 2.0 + i * L / float(nx - 1) for i in range(nx)]
+rho_free, rho_harm = [], []
+for i in range(nx):
+    rho_free.append([funct_rho_free(x[i], x[j], beta) for j in range(nx)])
+    rho_harm.append([rho_free[i][j] * math.exp(- beta * x[i] ** 2 / 2.0 -
+                     beta * x[j] ** 2 / 2.0) for j in range(nx)])
+
+# graphics output (free particle)
+pylab.imshow(rho_free, extent=[0.0, L, 0.0, L], origin='lower')
+pylab.xlabel('$x$', fontsize=16)
+pylab.ylabel('$x\'$', fontsize=16)
+pylab.colorbar()
+pylab.title('$\\beta$=%s (free)' % beta)
+pylab.savefig('plot-trotter-free.png')
+pylab.clf()
+# graphics output (harmonic potential)
+pylab.imshow(rho_harm, extent=[0.0, L, 0.0, L], origin='lower')
+pylab.xlabel('$x$', fontsize=16)
+pylab.ylabel('$x\'$', fontsize=16)
+pylab.colorbar()
+pylab.title('$\\beta$=%s (harmonic)' % beta)
+pylab.savefig('plot-trotter-harmonic.png')
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_tutorial_05\quantum_time_evolution.py@@@@@@@@@@@@@@@@@@@@@@@@import numpy, pylab, os
+
+def fourier_x_to_p(phi_x, dx):
+    phi_p = [(phi_x * numpy.exp(-1j * p * grid_x)).sum() * dx for p in grid_p]
+    return numpy.array(phi_p)
+
+def fourier_p_to_x(phi_p, dp):
+    phi_x = [(phi_p * numpy.exp(1j * x * grid_p)).sum() for x in grid_x]
+    return numpy.array(phi_x) /  (2.0 * numpy.pi)
+
+def time_step_evolution(psi0, potential, grid_x, grid_p, dx, dp, delta_t):
+    psi0 = numpy.exp(-1j * potential * delta_t / 2.0) * psi0
+    psi0 = fourier_x_to_p(psi0, dx)
+    psi0 = numpy.exp(-1j * grid_p ** 2 * delta_t / 2.0) * psi0
+    psi0 = fourier_p_to_x(psi0, dp)
+    psi0 = numpy.exp(-1j * potential * delta_t / 2.0) * psi0
+    psi0 /= (numpy.absolute(psi0 ** 2).sum() * dx)
+    return psi0
+
+def funct_potential(x):
+    if x < -8.0:    return (x + 8.0) ** 2
+    elif x <= -1.0: return 0.0
+    elif x < 1.0:   return numpy.exp(-1.0 / (1.0 - x ** 2)) / numpy.exp(-1.0)
+    else:           return 0.0
+
+output_dir = 'snapshots_time_evolution'
+if not os.path.exists(output_dir): os.makedirs(output_dir)
+def show(x, psi, pot, time, timestep):
+    pylab.plot(x, psi, 'g', linewidth = 2.0, label = '$|\psi(x)|^2$')
+    pylab.xlim(-10, 15)
+    pylab.ylim(-0.1, 1.15)
+    pylab.plot(x, pot, 'k', linewidth = 2.0, label = '$V(x)$')
+    pylab.xlabel('$x$', fontsize = 20)
+    pylab.title('time = %s' % time)
+    pylab.legend(loc=1)
+    pylab.savefig(output_dir + '/snapshot_%05i.png' % timestep)
+    timestep += 1
+    pylab.clf()
+
+steps = 800
+x_min = -12.0
+x_max = 40.0
+grid_x = numpy.linspace(x_min, x_max, steps)
+grid_p = numpy.linspace(x_min, x_max, steps)
+dx  = grid_x[1] - grid_x[0]
+dp  = grid_p[1] - grid_p[0]
+delta_t = 0.05
+t_max = 16.0
+
+potential = [funct_potential(x) for x in grid_x]
+potential = numpy.array(potential)
+# initial state:
+x0 = -8.0
+sigma = .5
+psi = numpy.exp(-(grid_x - x0) ** 2 / (2.0 * sigma ** 2) )
+psi /= numpy.sqrt( sigma * numpy.sqrt( numpy.pi ) )
+# time evolution
+time = 0.0
+timestep = 0
+while time < t_max:
+    if timestep % 4 == 0:
+        show(grid_x, numpy.absolute(psi) ** 2.0, potential, time, timestep)
+    print time
+    time += delta_t
+    timestep += 1
+    psi = time_step_evolution(psi, potential, grid_x, grid_p, dx, dp, delta_t)

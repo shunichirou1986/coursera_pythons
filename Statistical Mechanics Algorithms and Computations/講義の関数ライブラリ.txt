@@ -1,0 +1,32 @@
+Week1
+
+Homework1C2ƒGƒ‰[‚ğŒ©Ï‚à‚éŠÖ”‰ü
+
+poweroftwo = 14
+n_trials = 2 ** poweroftwo
+delta = 0.1
+data = markov_pi_all_data(n_trials, delta)
+errors  = []
+bunches = []
+for i in range(poweroftwo):
+    new_data = []
+    mean = 0.0
+    mean_sq = 0.0
+    N = len(data)
+    while data != []:
+        x = data.pop()
+        y = data.pop()
+        mean += x + y
+        mean_sq += x ** 2 + y ** 2
+        new_data.append((x + y) / 2.0 )
+    errors.append(math.sqrt(mean_sq / N - (mean / N) ** 2) / math.sqrt(N))
+    bunches.append(i)
+    data = new_data[:]
+pylab.plot(bunches, errors, 'o')
+pylab.xlabel('iteration')
+pylab.ylabel('naive error')
+pylab.title('Bunching: naive error vs iteration number')
+pylab.savefig('apparent_error_bunching.png', format='PNG')
+pylab.show()
+
+

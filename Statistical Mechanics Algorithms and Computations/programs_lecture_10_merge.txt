@@ -1,0 +1,150 @@
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_10\direct_gamma.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+gamma = -0.8
+x_mean = 1.0 / (gamma + 1.0)
+n_steps = 10000
+tot = 0.0
+tot_sq = 0.0
+for step in xrange(n_steps):
+    x = random.uniform(0.0, 1.0)
+    tot += x ** gamma
+    tot_sq += (x ** gamma) ** 2
+av = tot / float(n_steps)
+av_sq = tot_sq / float(n_steps)
+err = math.sqrt((av_sq - av ** 2) / n_steps)
+print '%f +/- %f (exact: %f)' % (av, err, x_mean)
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_10\direct_gamma_average.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+gamma = -0.8
+list_N = [1, 10, 100, 1000, 10000]
+n_steps = 1000000
+for N in list_N:
+    print N
+    x = []
+    for step in xrange(n_steps / N):
+        Sigma = sum(random.uniform(0.0, 1.0) ** gamma for j in xrange(N))
+        x.append(Sigma / float(N))
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_10\direct_gamma_average_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, pylab
+
+gamma = -0.8
+list_N = [1, 10, 100, 1000, 10000]
+n_steps = 1000000
+for N in list_N:
+    print N
+    x = []
+    for step in xrange(n_steps / N):
+        Sigma = sum(random.uniform(0.0, 1.0) ** gamma for j in xrange(N))
+        x.append(Sigma / float(N))
+    pylab.hist(x, bins=125, normed=True, alpha=0.5, range=[0.0, 10.0], label='N=%i' % N)
+pylab.axvline(5.0, c='k', lw=2.0, ls='--')
+pylab.legend()
+pylab.xlim(1.0, 10.0)
+pylab.xlabel('average $\Sigma_N / N$', fontsize=18)
+pylab.ylabel('histogram $\pi(\Sigma_N / N)$', fontsize=18)
+pylab.title('$\gamma=%f$' % gamma, fontsize=18)
+pylab.savefig('histo_direct_gamma_average.png')
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_10\direct_gamma_average_rescaled.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+gamma = -0.8
+x_mean = 1.0 / (gamma + 1.0)
+list_N = [1, 10, 100, 1000, 10000]
+n_steps = 10000000
+for N in list_N:
+    print N
+    x = []
+    for step in xrange(n_steps / N):
+        Sigma = sum(random.uniform(0.0, 1.0) ** gamma for j in xrange(N))
+        x.append((Sigma / float(N) - x_mean) * float(N) ** (1.0 + gamma))
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_10\direct_gamma_average_rescaled_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, cmath, pylab
+
+def pi_exact(x, gamma, c0, c1):
+    alpha = -1.0 / gamma
+    t_min, t_max = -20.0, 20.0
+    n_t = 1000
+    delta_t = (t_max - t_min) / float(n_t)
+    tot = 0.0
+    for j in range(n_t):
+        t = t_min + j * delta_t
+        tot += cmath.exp(-1j * x * t - (c0 * abs(t) ** alpha + 1j * c1 * t * abs(t) ** (alpha - 1.0)))
+    tot *= delta_t
+    tot /= (2.0 * math.pi)
+    return tot.real
+        
+# Warning: the values of the coefficients c0 and c1 used here are specific for the case of gamma=-0.8
+gamma = -0.8
+c0, c1 = 1.8758, 4.5286
+x_mean = 5.0
+list_N = [10, 100, 1000, 10000]
+n_steps = 10000000
+for N in list_N:
+    print N
+    x = []
+    for step in xrange(n_steps / N):
+        Sigma = sum(random.uniform(0.0, 1.0) ** gamma for j in xrange(N))
+        x.append((Sigma / float(N) - x_mean) * float(N) ** (1.0 + gamma))
+    pylab.hist(x, bins=100, normed=True, alpha=0.5, range=[-10.0, 10.0], label='N=%i' % N)
+x_stable = [-10.0 + i * 0.1 for i in range(200)]
+y_stable = [pi_exact(x, gamma, c0, c1) for x in x_stable]
+pylab.plot(x_stable, y_stable, 'r', lw=2.5, label='Levy stable distr.')
+pylab.legend()
+pylab.axis([-10.0, 10.0, 0.0, 0.3])
+pylab.xlabel('rescaled average $\Upsilon$', fontsize=18)
+pylab.ylabel('histogram $\pi(\Upsilon)$', fontsize=18)
+pylab.title('$\gamma=%f$' % gamma, fontsize=18)
+pylab.savefig('histo_direct_gamma_average_rescaled.png')
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_10\direct_gamma_running.py@@@@@@@@@@@@@@@@@@@@@@@@import random
+
+gamma = -0.8
+n_steps = 10000000
+tot = 0.0
+running = []
+for step in xrange(n_steps):
+    tot += random.uniform(0.0, 1.0) ** gamma
+    av = tot / float(step + 1)
+    running.append(av)
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_10\direct_gamma_running_movie.py@@@@@@@@@@@@@@@@@@@@@@@@import random, pylab
+
+gamma = -0.8
+n_steps = 5000000
+tot = 0.0
+running = []
+for step in xrange(n_steps):
+    tot += random.uniform(0.0, 1.0) ** gamma
+    av = tot / float(step + 1)
+    running.append(av)
+pylab.plot(running)
+pylab.axhline(1.0 / (1.0 + gamma), c='r', ls='--', lw=2.5, label='value of the $\gamma$-integral')
+pylab.ylim(2.0, 8.0)
+pylab.ylabel('running average $\Sigma_n/n$', fontsize=18)
+pylab.xlabel('number of samples $n$', fontsize=18)
+pylab.legend()
+pylab.savefig('running_average.png')
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_10\direct_needle.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+a = 0.6
+b = 1.0
+n_hits = 0
+n_steps = 1000000
+for n in range(n_steps):
+    x_center = random.uniform(0.0, b * 0.5)
+    phi = random.uniform(0.0, math.pi * 0.5)
+    x_tip = x_center - a * 0.5 * math.cos(phi)
+    if x_tip < 0.0: n_hits += 1
+print a * 2.0 * n_steps / float(n_hits) / b
+
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\programs_lecture_10\direct_needle_patch.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+a = 0.6
+b = 1.0
+n_hits = 0
+n_steps = 1000000
+for n in range(n_steps):
+    x_center = random.uniform(0.0, b * 0.5)
+    while True:
+        dx = random.uniform(0.0, 1.0)
+        dy = random.uniform(0.0, 1.0)
+        rad = math.sqrt(dx ** 2 + dy ** 2)
+        if rad <= 1.0: break
+    x_tip = x_center - a * 0.5 * dx / rad
+    if x_tip < 0.0: n_hits += 1
+print a * 2.0 * n_steps / float(n_hits) / b

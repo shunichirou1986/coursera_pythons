@@ -1,0 +1,1086 @@
+import math, pylab
+
+n_states = 40
+Energies = [0.5 + i for i in range(n_states)]
+dx = 0.2
+grid_x = [i * dx for i in range(-25, 26)]
+psi = {}
+for x in grid_x:
+    psi[x] = [math.exp(-x ** 2 / 2.0) / math.pi ** 0.25]  # ground state
+    psi[x].append(math.sqrt(2.0) * x * psi[x][0])         # first excited state
+    # other excited states (through recursion):
+    for n in range(2, n_states):
+        psi[x].append(math.sqrt(2.0 / n) * x * psi[x][n - 1] -
+                      math.sqrt((n - 1.0) / n) * psi[x][n - 2])
+beta = 2.0
+Z = sum(math.exp(-beta * Energies[k]) for k in range(n_states))
+print beta, 'beta'
+print Z, ' Z from \sum_n exp(-beta E_n)'
+print 1.0 / (2.0 * math.sinh(beta/2)), ' Z (exact)'
+Z_trace = 0.0
+x_values = []
+y_values = []
+for x in grid_x:
+    rho_xx = sum(math.exp(-beta * Energies[i]) * psi[x][i] ** 2 for i in range(n_states))
+    Z_trace += rho_xx * dx
+    x_values.append(x)
+    y_values.append(rho_xx/Z)
+print Z_trace, ' Z (from trace over density matrix)'
+pylab.title('Harmonic oscillator $ \\beta = 2$ ')
+pylab.xlabel('x')
+pylab.ylabel('$\pi(x)$')
+pylab.plot(x_values, y_values, label='harmonic_wavefunctions')
+pylab.legend()
+pylab.axis([-4.0, 4.0, 0.0, 0.6])
+pylab.savefig('density_x_harm_wave.png')
+pylab.show()import random, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data_sum = 0.0
+    data_sum_sq = 0.0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data_sum += 4.0
+            data_sum_sq += 4.0 ** 2
+    return data_sum / float(N), data_sum_sq / float(N)
+
+n_trials = 2 ** 14
+delta = 0.1
+n_parties = 100
+inside_error_bar = 0
+for iteration in range(n_parties):
+    mean, mean_square = markov_pi_all_data(n_trials, delta)
+    naive_error = math.sqrt(mean_square  - mean ** 2) / math.sqrt(n_trials)
+    error =  abs(mean - math.pi)
+    if error < naive_error: inside_error_bar += 1
+    print mean, error, naive_error
+print inside_error_bar / float(n_parties),'fraction: error bar including pi'import random, pylab, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data = []
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data.append(4.0)
+        else:
+            data.append(0.0)
+    return data
+
+poweroftwo = 14
+n_trials = 2 ** poweroftwo
+delta = 0.1
+data = markov_pi_all_data(n_trials, delta)
+errors  = []
+bunches = []
+for i in range(poweroftwo):
+    new_data = []
+    mean = 0.0
+    mean_sq = 0.0
+    N = len(data)
+    while data != []:
+        x = data.pop()
+        y = data.pop()
+        mean += x + y
+        mean_sq += x ** 2 + y ** 2
+        new_data.append((x + y) / 2.0 )
+    errors.append(math.sqrt(mean_sq / N - (mean / N) ** 2) / math.sqrt(N))
+    bunches.append(i)
+    data = new_data[:]
+pylab.plot(bunches, errors, 'o')
+pylab.xlabel('iteration')
+pylab.ylabel('naive error')
+pylab.title('Bunching: naive error vs iteration number')
+pylab.savefig('apparent_error_bunching.png', format='PNG')
+pylab.show()import random,math,pylab 
+
+def markov_pi(N, delta): 
+    x, y = 1.0, 1.0
+    n_hits = 0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+            
+        if x**2 + y**2 < 1.0: n_hits += 1
+       
+    return n_hits
+
+n_trials = 10000
+sigma_list500 = []
+sigma_list1000 = []
+delta_list = []
+
+n_runs = 1000
+delta = 0.1
+sigma = 0.0
+
+while delta < 5.0 :
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est500 = 4.0 * markov_pi(n_trials, delta) / float(n_trials)
+        sigma += (pi_est500 - math.pi ) **2
+        
+    sigma_list500.append(math.sqrt(sigma/(n_runs)))
+    delta_list.append(delta)
+    print delta,pi_est500
+    delta += 0.1
+
+
+
+
+pylab.plot(delta_list, sigma_list500,  'o')
+
+pylab.ylabel('RMS error')
+pylab.xlabel('$\delta$')
+pylab.title('RMS vs delta')
+pylab.savefig('markov_pi_multirun_nruns_RMS.png')
+pylab.show()
+
+    
+    
+import random, math, pylab
+
+def direct_pi(N):
+    n_hits = 0
+    for i in range(N):
+        x, y = random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0)
+        if x ** 2 + y ** 2 < 1.0:
+            n_hits += 1
+    return n_hits
+
+n_runs = 500
+n_trials_list = []
+sigmas = []
+for poweroftwo in range(0, 10):
+    n_trials = 2 ** poweroftwo
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est = 4.0 * direct_pi(n_trials) / float(n_trials)
+        sigma += (pi_est - math.pi) ** 2
+    sigmas.append(math.sqrt(sigma/(n_runs)))
+    n_trials_list.append(n_trials)
+
+print sigmas
+print n_trials_list
+
+
+pylab.plot(n_trials_list, sigmas, 'o')
+pylab.gca().set_xscale('log')
+pylab.gca().set_yscale('log')
+pylab.xlabel('n_trials')
+pylab.ylabel('$\sigma$')
+pylab.title('Direct sampling: Standard deviation $\sigma$ as a function of n_trials')
+pylab.savefig('direct_sampling_statistical_error.png')
+pylab.show()
+py_filenameimport math, pylab
+
+n_states = 40
+Energies = [0.5 + i for i in range(n_states)]
+dx = 0.2
+grid_x = [i * dx for i in range(-25, 26)]
+psi = {}
+for x in grid_x:
+    psi[x] = [math.exp(-x ** 2 / 2.0) / math.pi ** 0.25]  # ground state
+    psi[x].append(math.sqrt(2.0) * x * psi[x][0])         # first excited state
+    # other excited states (through recursion):
+    for n in range(2, n_states):
+        psi[x].append(math.sqrt(2.0 / n) * x * psi[x][n - 1] -
+                      math.sqrt((n - 1.0) / n) * psi[x][n - 2])
+beta = 2.0
+Z = sum(math.exp(-beta * Energies[k]) for k in range(n_states))
+print beta, 'beta'
+print Z, ' Z from \sum_n exp(-beta E_n)'
+print 1.0 / (2.0 * math.sinh(beta/2)), ' Z (exact)'
+Z_trace = 0.0
+x_values = []
+y_values = []
+for x in grid_x:
+    rho_xx = sum(math.exp(-beta * Energies[i]) * psi[x][i] ** 2 for i in range(n_states))
+    Z_trace += rho_xx * dx
+    x_values.append(x)
+    y_values.append(rho_xx/Z)
+print Z_trace, ' Z (from trace over density matrix)'
+pylab.title('Harmonic oscillator $ \\beta = 2$ ')
+pylab.xlabel('x')
+pylab.ylabel('$\pi(x)$')
+pylab.plot(x_values, y_values, label='harmonic_wavefunctions')
+pylab.legend()
+pylab.axis([-4.0, 4.0, 0.0, 0.6])
+pylab.savefig('density_x_harm_wave.png')
+pylab.show()py_filenameimport random, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data_sum = 0.0
+    data_sum_sq = 0.0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data_sum += 4.0
+            data_sum_sq += 4.0 ** 2
+    return data_sum / float(N), data_sum_sq / float(N)
+
+n_trials = 2 ** 14
+delta = 0.1
+n_parties = 100
+inside_error_bar = 0
+for iteration in range(n_parties):
+    mean, mean_square = markov_pi_all_data(n_trials, delta)
+    naive_error = math.sqrt(mean_square  - mean ** 2) / math.sqrt(n_trials)
+    error =  abs(mean - math.pi)
+    if error < naive_error: inside_error_bar += 1
+    print mean, error, naive_error
+print inside_error_bar / float(n_parties),'fraction: error bar including pi'py_filenameimport random, pylab, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data = []
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data.append(4.0)
+        else:
+            data.append(0.0)
+    return data
+
+poweroftwo = 14
+n_trials = 2 ** poweroftwo
+delta = 0.1
+data = markov_pi_all_data(n_trials, delta)
+errors  = []
+bunches = []
+for i in range(poweroftwo):
+    new_data = []
+    mean = 0.0
+    mean_sq = 0.0
+    N = len(data)
+    while data != []:
+        x = data.pop()
+        y = data.pop()
+        mean += x + y
+        mean_sq += x ** 2 + y ** 2
+        new_data.append((x + y) / 2.0 )
+    errors.append(math.sqrt(mean_sq / N - (mean / N) ** 2) / math.sqrt(N))
+    bunches.append(i)
+    data = new_data[:]
+pylab.plot(bunches, errors, 'o')
+pylab.xlabel('iteration')
+pylab.ylabel('naive error')
+pylab.title('Bunching: naive error vs iteration number')
+pylab.savefig('apparent_error_bunching.png', format='PNG')
+pylab.show()py_filenameimport random,math,pylab 
+
+def markov_pi(N, delta): 
+    x, y = 1.0, 1.0
+    n_hits = 0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+            
+        if x**2 + y**2 < 1.0: n_hits += 1
+       
+    return n_hits
+
+n_trials = 10000
+sigma_list500 = []
+sigma_list1000 = []
+delta_list = []
+
+n_runs = 1000
+delta = 0.1
+sigma = 0.0
+
+while delta < 5.0 :
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est500 = 4.0 * markov_pi(n_trials, delta) / float(n_trials)
+        sigma += (pi_est500 - math.pi ) **2
+        
+    sigma_list500.append(math.sqrt(sigma/(n_runs)))
+    delta_list.append(delta)
+    print delta,pi_est500
+    delta += 0.1
+
+
+
+
+pylab.plot(delta_list, sigma_list500,  'o')
+
+pylab.ylabel('RMS error')
+pylab.xlabel('$\delta$')
+pylab.title('RMS vs delta')
+pylab.savefig('markov_pi_multirun_nruns_RMS.png')
+pylab.show()
+
+    
+    
+py_filenameimport random, math, pylab
+
+def direct_pi(N):
+    n_hits = 0
+    for i in range(N):
+        x, y = random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0)
+        if x ** 2 + y ** 2 < 1.0:
+            n_hits += 1
+    return n_hits
+
+n_runs = 500
+n_trials_list = []
+sigmas = []
+for poweroftwo in range(0, 10):
+    n_trials = 2 ** poweroftwo
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est = 4.0 * direct_pi(n_trials) / float(n_trials)
+        sigma += (pi_est - math.pi) ** 2
+    sigmas.append(math.sqrt(sigma/(n_runs)))
+    n_trials_list.append(n_trials)
+
+print sigmas
+print n_trials_list
+
+
+pylab.plot(n_trials_list, sigmas, 'o')
+pylab.gca().set_xscale('log')
+pylab.gca().set_yscale('log')
+pylab.xlabel('n_trials')
+pylab.ylabel('$\sigma$')
+pylab.title('Direct sampling: Standard deviation $\sigma$ as a function of n_trials')
+pylab.savefig('direct_sampling_statistical_error.png')
+pylab.show()
+py_Kugiriimport math, pylab
+
+n_states = 40
+Energies = [0.5 + i for i in range(n_states)]
+dx = 0.2
+grid_x = [i * dx for i in range(-25, 26)]
+psi = {}
+for x in grid_x:
+    psi[x] = [math.exp(-x ** 2 / 2.0) / math.pi ** 0.25]  # ground state
+    psi[x].append(math.sqrt(2.0) * x * psi[x][0])         # first excited state
+    # other excited states (through recursion):
+    for n in range(2, n_states):
+        psi[x].append(math.sqrt(2.0 / n) * x * psi[x][n - 1] -
+                      math.sqrt((n - 1.0) / n) * psi[x][n - 2])
+beta = 2.0
+Z = sum(math.exp(-beta * Energies[k]) for k in range(n_states))
+print beta, 'beta'
+print Z, ' Z from \sum_n exp(-beta E_n)'
+print 1.0 / (2.0 * math.sinh(beta/2)), ' Z (exact)'
+Z_trace = 0.0
+x_values = []
+y_values = []
+for x in grid_x:
+    rho_xx = sum(math.exp(-beta * Energies[i]) * psi[x][i] ** 2 for i in range(n_states))
+    Z_trace += rho_xx * dx
+    x_values.append(x)
+    y_values.append(rho_xx/Z)
+print Z_trace, ' Z (from trace over density matrix)'
+pylab.title('Harmonic oscillator $ \\beta = 2$ ')
+pylab.xlabel('x')
+pylab.ylabel('$\pi(x)$')
+pylab.plot(x_values, y_values, label='harmonic_wavefunctions')
+pylab.legend()
+pylab.axis([-4.0, 4.0, 0.0, 0.6])
+pylab.savefig('density_x_harm_wave.png')
+pylab.show()py_Kugiriimport random, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data_sum = 0.0
+    data_sum_sq = 0.0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data_sum += 4.0
+            data_sum_sq += 4.0 ** 2
+    return data_sum / float(N), data_sum_sq / float(N)
+
+n_trials = 2 ** 14
+delta = 0.1
+n_parties = 100
+inside_error_bar = 0
+for iteration in range(n_parties):
+    mean, mean_square = markov_pi_all_data(n_trials, delta)
+    naive_error = math.sqrt(mean_square  - mean ** 2) / math.sqrt(n_trials)
+    error =  abs(mean - math.pi)
+    if error < naive_error: inside_error_bar += 1
+    print mean, error, naive_error
+print inside_error_bar / float(n_parties),'fraction: error bar including pi'py_Kugiriimport random, pylab, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data = []
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data.append(4.0)
+        else:
+            data.append(0.0)
+    return data
+
+poweroftwo = 14
+n_trials = 2 ** poweroftwo
+delta = 0.1
+data = markov_pi_all_data(n_trials, delta)
+errors  = []
+bunches = []
+for i in range(poweroftwo):
+    new_data = []
+    mean = 0.0
+    mean_sq = 0.0
+    N = len(data)
+    while data != []:
+        x = data.pop()
+        y = data.pop()
+        mean += x + y
+        mean_sq += x ** 2 + y ** 2
+        new_data.append((x + y) / 2.0 )
+    errors.append(math.sqrt(mean_sq / N - (mean / N) ** 2) / math.sqrt(N))
+    bunches.append(i)
+    data = new_data[:]
+pylab.plot(bunches, errors, 'o')
+pylab.xlabel('iteration')
+pylab.ylabel('naive error')
+pylab.title('Bunching: naive error vs iteration number')
+pylab.savefig('apparent_error_bunching.png', format='PNG')
+pylab.show()py_Kugiriimport random,math,pylab 
+
+def markov_pi(N, delta): 
+    x, y = 1.0, 1.0
+    n_hits = 0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+            
+        if x**2 + y**2 < 1.0: n_hits += 1
+       
+    return n_hits
+
+n_trials = 10000
+sigma_list500 = []
+sigma_list1000 = []
+delta_list = []
+
+n_runs = 1000
+delta = 0.1
+sigma = 0.0
+
+while delta < 5.0 :
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est500 = 4.0 * markov_pi(n_trials, delta) / float(n_trials)
+        sigma += (pi_est500 - math.pi ) **2
+        
+    sigma_list500.append(math.sqrt(sigma/(n_runs)))
+    delta_list.append(delta)
+    print delta,pi_est500
+    delta += 0.1
+
+
+
+
+pylab.plot(delta_list, sigma_list500,  'o')
+
+pylab.ylabel('RMS error')
+pylab.xlabel('$\delta$')
+pylab.title('RMS vs delta')
+pylab.savefig('markov_pi_multirun_nruns_RMS.png')
+pylab.show()
+
+    
+    
+py_Kugiriimport random, math, pylab
+
+def direct_pi(N):
+    n_hits = 0
+    for i in range(N):
+        x, y = random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0)
+        if x ** 2 + y ** 2 < 1.0:
+            n_hits += 1
+    return n_hits
+
+n_runs = 500
+n_trials_list = []
+sigmas = []
+for poweroftwo in range(0, 10):
+    n_trials = 2 ** poweroftwo
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est = 4.0 * direct_pi(n_trials) / float(n_trials)
+        sigma += (pi_est - math.pi) ** 2
+    sigmas.append(math.sqrt(sigma/(n_runs)))
+    n_trials_list.append(n_trials)
+
+print sigmas
+print n_trials_list
+
+
+pylab.plot(n_trials_list, sigmas, 'o')
+pylab.gca().set_xscale('log')
+pylab.gca().set_yscale('log')
+pylab.xlabel('n_trials')
+pylab.ylabel('$\sigma$')
+pylab.title('Direct sampling: Standard deviation $\sigma$ as a function of n_trials')
+pylab.savefig('direct_sampling_statistical_error.png')
+pylab.show()
+py_Kugiriimport math, pylab
+
+n_states = 40
+Energies = [0.5 + i for i in range(n_states)]
+dx = 0.2
+grid_x = [i * dx for i in range(-25, 26)]
+psi = {}
+for x in grid_x:
+    psi[x] = [math.exp(-x ** 2 / 2.0) / math.pi ** 0.25]  # ground state
+    psi[x].append(math.sqrt(2.0) * x * psi[x][0])         # first excited state
+    # other excited states (through recursion):
+    for n in range(2, n_states):
+        psi[x].append(math.sqrt(2.0 / n) * x * psi[x][n - 1] -
+                      math.sqrt((n - 1.0) / n) * psi[x][n - 2])
+beta = 2.0
+Z = sum(math.exp(-beta * Energies[k]) for k in range(n_states))
+print beta, 'beta'
+print Z, ' Z from \sum_n exp(-beta E_n)'
+print 1.0 / (2.0 * math.sinh(beta/2)), ' Z (exact)'
+Z_trace = 0.0
+x_values = []
+y_values = []
+for x in grid_x:
+    rho_xx = sum(math.exp(-beta * Energies[i]) * psi[x][i] ** 2 for i in range(n_states))
+    Z_trace += rho_xx * dx
+    x_values.append(x)
+    y_values.append(rho_xx/Z)
+print Z_trace, ' Z (from trace over density matrix)'
+pylab.title('Harmonic oscillator $ \\beta = 2$ ')
+pylab.xlabel('x')
+pylab.ylabel('$\pi(x)$')
+pylab.plot(x_values, y_values, label='harmonic_wavefunctions')
+pylab.legend()
+pylab.axis([-4.0, 4.0, 0.0, 0.6])
+pylab.savefig('density_x_harm_wave.png')
+pylab.show()py_Kugiriimport random, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data_sum = 0.0
+    data_sum_sq = 0.0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data_sum += 4.0
+            data_sum_sq += 4.0 ** 2
+    return data_sum / float(N), data_sum_sq / float(N)
+
+n_trials = 2 ** 14
+delta = 0.1
+n_parties = 100
+inside_error_bar = 0
+for iteration in range(n_parties):
+    mean, mean_square = markov_pi_all_data(n_trials, delta)
+    naive_error = math.sqrt(mean_square  - mean ** 2) / math.sqrt(n_trials)
+    error =  abs(mean - math.pi)
+    if error < naive_error: inside_error_bar += 1
+    print mean, error, naive_error
+print inside_error_bar / float(n_parties),'fraction: error bar including pi'py_Kugiriimport random, pylab, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data = []
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data.append(4.0)
+        else:
+            data.append(0.0)
+    return data
+
+poweroftwo = 14
+n_trials = 2 ** poweroftwo
+delta = 0.1
+data = markov_pi_all_data(n_trials, delta)
+errors  = []
+bunches = []
+for i in range(poweroftwo):
+    new_data = []
+    mean = 0.0
+    mean_sq = 0.0
+    N = len(data)
+    while data != []:
+        x = data.pop()
+        y = data.pop()
+        mean += x + y
+        mean_sq += x ** 2 + y ** 2
+        new_data.append((x + y) / 2.0 )
+    errors.append(math.sqrt(mean_sq / N - (mean / N) ** 2) / math.sqrt(N))
+    bunches.append(i)
+    data = new_data[:]
+pylab.plot(bunches, errors, 'o')
+pylab.xlabel('iteration')
+pylab.ylabel('naive error')
+pylab.title('Bunching: naive error vs iteration number')
+pylab.savefig('apparent_error_bunching.png', format='PNG')
+pylab.show()py_Kugiriimport random,math,pylab 
+
+def markov_pi(N, delta): 
+    x, y = 1.0, 1.0
+    n_hits = 0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+            
+        if x**2 + y**2 < 1.0: n_hits += 1
+       
+    return n_hits
+
+n_trials = 10000
+sigma_list500 = []
+sigma_list1000 = []
+delta_list = []
+
+n_runs = 1000
+delta = 0.1
+sigma = 0.0
+
+while delta < 5.0 :
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est500 = 4.0 * markov_pi(n_trials, delta) / float(n_trials)
+        sigma += (pi_est500 - math.pi ) **2
+        
+    sigma_list500.append(math.sqrt(sigma/(n_runs)))
+    delta_list.append(delta)
+    print delta,pi_est500
+    delta += 0.1
+
+
+
+
+pylab.plot(delta_list, sigma_list500,  'o')
+
+pylab.ylabel('RMS error')
+pylab.xlabel('$\delta$')
+pylab.title('RMS vs delta')
+pylab.savefig('markov_pi_multirun_nruns_RMS.png')
+pylab.show()
+
+    
+    
+py_Kugiriimport random, math, pylab
+
+def direct_pi(N):
+    n_hits = 0
+    for i in range(N):
+        x, y = random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0)
+        if x ** 2 + y ** 2 < 1.0:
+            n_hits += 1
+    return n_hits
+
+n_runs = 500
+n_trials_list = []
+sigmas = []
+for poweroftwo in range(0, 10):
+    n_trials = 2 ** poweroftwo
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est = 4.0 * direct_pi(n_trials) / float(n_trials)
+        sigma += (pi_est - math.pi) ** 2
+    sigmas.append(math.sqrt(sigma/(n_runs)))
+    n_trials_list.append(n_trials)
+
+print sigmas
+print n_trials_list
+
+
+pylab.plot(n_trials_list, sigmas, 'o')
+pylab.gca().set_xscale('log')
+pylab.gca().set_yscale('log')
+pylab.xlabel('n_trials')
+pylab.ylabel('$\sigma$')
+pylab.title('Direct sampling: Standard deviation $\sigma$ as a function of n_trials')
+pylab.savefig('direct_sampling_statistical_error.png')
+pylab.show()
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\B1_Answer.py@@@@@@@@@@@@@@@@@@@@@@@@import math, pylab
+
+n_states = 40
+Energies = [0.5 + i for i in range(n_states)]
+dx = 0.2
+grid_x = [i * dx for i in range(-25, 26)]
+psi = {}
+for x in grid_x:
+    psi[x] = [math.exp(-x ** 2 / 2.0) / math.pi ** 0.25]  # ground state
+    psi[x].append(math.sqrt(2.0) * x * psi[x][0])         # first excited state
+    # other excited states (through recursion):
+    for n in range(2, n_states):
+        psi[x].append(math.sqrt(2.0 / n) * x * psi[x][n - 1] -
+                      math.sqrt((n - 1.0) / n) * psi[x][n - 2])
+beta = 2.0
+Z = sum(math.exp(-beta * Energies[k]) for k in range(n_states))
+print beta, 'beta'
+print Z, ' Z from \sum_n exp(-beta E_n)'
+print 1.0 / (2.0 * math.sinh(beta/2)), ' Z (exact)'
+Z_trace = 0.0
+x_values = []
+y_values = []
+for x in grid_x:
+    rho_xx = sum(math.exp(-beta * Energies[i]) * psi[x][i] ** 2 for i in range(n_states))
+    Z_trace += rho_xx * dx
+    x_values.append(x)
+    y_values.append(rho_xx/Z)
+print Z_trace, ' Z (from trace over density matrix)'
+pylab.title('Harmonic oscillator $ \\beta = 2$ ')
+pylab.xlabel('x')
+pylab.ylabel('$\pi(x)$')
+pylab.plot(x_values, y_values, label='harmonic_wavefunctions')
+pylab.legend()
+pylab.axis([-4.0, 4.0, 0.0, 0.6])
+pylab.savefig('density_x_harm_wave.png')
+pylab.show()@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\C1_errorestimate.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data_sum = 0.0
+    data_sum_sq = 0.0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data_sum += 4.0
+            data_sum_sq += 4.0 ** 2
+    return data_sum / float(N), data_sum_sq / float(N)
+
+n_trials = 2 ** 14
+delta = 0.1
+n_parties = 100
+inside_error_bar = 0
+for iteration in range(n_parties):
+    mean, mean_square = markov_pi_all_data(n_trials, delta)
+    naive_error = math.sqrt(mean_square  - mean ** 2) / math.sqrt(n_trials)
+    error =  abs(mean - math.pi)
+    if error < naive_error: inside_error_bar += 1
+    print mean, error, naive_error
+print inside_error_bar / float(n_parties),'fraction: error bar including pi'@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\C2_errorestimate_kai.py@@@@@@@@@@@@@@@@@@@@@@@@import random, pylab, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data = []
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data.append(4.0)
+        else:
+            data.append(0.0)
+    return data
+
+poweroftwo = 14
+n_trials = 2 ** poweroftwo
+delta = 0.1
+data = markov_pi_all_data(n_trials, delta)
+errors  = []
+bunches = []
+for i in range(poweroftwo):
+    new_data = []
+    mean = 0.0
+    mean_sq = 0.0
+    N = len(data)
+    while data != []:
+        x = data.pop()
+        y = data.pop()
+        mean += x + y
+        mean_sq += x ** 2 + y ** 2
+        new_data.append((x + y) / 2.0 )
+    errors.append(math.sqrt(mean_sq / N - (mean / N) ** 2) / math.sqrt(N))
+    bunches.append(i)
+    data = new_data[:]
+pylab.plot(bunches, errors, 'o')
+pylab.xlabel('iteration')
+pylab.ylabel('naive error')
+pylab.title('Bunching: naive error vs iteration number')
+pylab.savefig('apparent_error_bunching.png', format='PNG')
+pylab.show()@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\markov_pi_multirun_homeworkmodified_getrms.py@@@@@@@@@@@@@@@@@@@@@@@@import random,math,pylab 
+
+def markov_pi(N, delta): 
+    x, y = 1.0, 1.0
+    n_hits = 0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+            
+        if x**2 + y**2 < 1.0: n_hits += 1
+       
+    return n_hits
+
+n_trials = 10000
+sigma_list500 = []
+sigma_list1000 = []
+delta_list = []
+
+n_runs = 1000
+delta = 0.1
+sigma = 0.0
+
+while delta < 5.0 :
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est500 = 4.0 * markov_pi(n_trials, delta) / float(n_trials)
+        sigma += (pi_est500 - math.pi ) **2
+        
+    sigma_list500.append(math.sqrt(sigma/(n_runs)))
+    delta_list.append(delta)
+    print delta,pi_est500
+    delta += 0.1
+
+
+
+
+pylab.plot(delta_list, sigma_list500,  'o')
+
+pylab.ylabel('RMS error')
+pylab.xlabel('$\delta$')
+pylab.title('RMS vs delta')
+pylab.savefig('markov_pi_multirun_nruns_RMS.png')
+pylab.show()
+
+    
+    
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\RMSofpi.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, pylab
+
+def direct_pi(N):
+    n_hits = 0
+    for i in range(N):
+        x, y = random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0)
+        if x ** 2 + y ** 2 < 1.0:
+            n_hits += 1
+    return n_hits
+
+n_runs = 500
+n_trials_list = []
+sigmas = []
+for poweroftwo in range(0, 10):
+    n_trials = 2 ** poweroftwo
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est = 4.0 * direct_pi(n_trials) / float(n_trials)
+        sigma += (pi_est - math.pi) ** 2
+    sigmas.append(math.sqrt(sigma/(n_runs)))
+    n_trials_list.append(n_trials)
+
+print sigmas
+print n_trials_list
+
+
+pylab.plot(n_trials_list, sigmas, 'o')
+pylab.gca().set_xscale('log')
+pylab.gca().set_yscale('log')
+pylab.xlabel('n_trials')
+pylab.ylabel('$\sigma$')
+pylab.title('Direct sampling: Standard deviation $\sigma$ as a function of n_trials')
+pylab.savefig('direct_sampling_statistical_error.png')
+pylab.show()
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\B1_Answer.py@@@@@@@@@@@@@@@@@@@@@@@@import math, pylab
+
+n_states = 40
+Energies = [0.5 + i for i in range(n_states)]
+dx = 0.2
+grid_x = [i * dx for i in range(-25, 26)]
+psi = {}
+for x in grid_x:
+    psi[x] = [math.exp(-x ** 2 / 2.0) / math.pi ** 0.25]  # ground state
+    psi[x].append(math.sqrt(2.0) * x * psi[x][0])         # first excited state
+    # other excited states (through recursion):
+    for n in range(2, n_states):
+        psi[x].append(math.sqrt(2.0 / n) * x * psi[x][n - 1] -
+                      math.sqrt((n - 1.0) / n) * psi[x][n - 2])
+beta = 2.0
+Z = sum(math.exp(-beta * Energies[k]) for k in range(n_states))
+print beta, 'beta'
+print Z, ' Z from \sum_n exp(-beta E_n)'
+print 1.0 / (2.0 * math.sinh(beta/2)), ' Z (exact)'
+Z_trace = 0.0
+x_values = []
+y_values = []
+for x in grid_x:
+    rho_xx = sum(math.exp(-beta * Energies[i]) * psi[x][i] ** 2 for i in range(n_states))
+    Z_trace += rho_xx * dx
+    x_values.append(x)
+    y_values.append(rho_xx/Z)
+print Z_trace, ' Z (from trace over density matrix)'
+pylab.title('Harmonic oscillator $ \\beta = 2$ ')
+pylab.xlabel('x')
+pylab.ylabel('$\pi(x)$')
+pylab.plot(x_values, y_values, label='harmonic_wavefunctions')
+pylab.legend()
+pylab.axis([-4.0, 4.0, 0.0, 0.6])
+pylab.savefig('density_x_harm_wave.png')
+pylab.show()@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\C1_errorestimate.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data_sum = 0.0
+    data_sum_sq = 0.0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data_sum += 4.0
+            data_sum_sq += 4.0 ** 2
+    return data_sum / float(N), data_sum_sq / float(N)
+
+n_trials = 2 ** 14
+delta = 0.1
+n_parties = 100
+inside_error_bar = 0
+for iteration in range(n_parties):
+    mean, mean_square = markov_pi_all_data(n_trials, delta)
+    naive_error = math.sqrt(mean_square  - mean ** 2) / math.sqrt(n_trials)
+    error =  abs(mean - math.pi)
+    if error < naive_error: inside_error_bar += 1
+    print mean, error, naive_error
+print inside_error_bar / float(n_parties),'fraction: error bar including pi'@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\C2_errorestimate_kai.py@@@@@@@@@@@@@@@@@@@@@@@@import random, pylab, math
+
+def markov_pi_all_data(N, delta):
+    x, y = 1.0, 1.0
+    data = []
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+        if x ** 2 + y ** 2 < 1.0:
+            data.append(4.0)
+        else:
+            data.append(0.0)
+    return data
+
+poweroftwo = 14
+n_trials = 2 ** poweroftwo
+delta = 0.1
+data = markov_pi_all_data(n_trials, delta)
+errors  = []
+bunches = []
+for i in range(poweroftwo):
+    new_data = []
+    mean = 0.0
+    mean_sq = 0.0
+    N = len(data)
+    while data != []:
+        x = data.pop()
+        y = data.pop()
+        mean += x + y
+        mean_sq += x ** 2 + y ** 2
+        new_data.append((x + y) / 2.0 )
+    errors.append(math.sqrt(mean_sq / N - (mean / N) ** 2) / math.sqrt(N))
+    bunches.append(i)
+    data = new_data[:]
+pylab.plot(bunches, errors, 'o')
+pylab.xlabel('iteration')
+pylab.ylabel('naive error')
+pylab.title('Bunching: naive error vs iteration number')
+pylab.savefig('apparent_error_bunching.png', format='PNG')
+pylab.show()@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\markov_pi_multirun_homeworkmodified_getrms.py@@@@@@@@@@@@@@@@@@@@@@@@import random,math,pylab 
+
+def markov_pi(N, delta): 
+    x, y = 1.0, 1.0
+    n_hits = 0
+    for i in range(N):
+        del_x, del_y = random.uniform(-delta, delta), random.uniform(-delta, delta)
+        if abs(x + del_x) < 1.0 and abs(y + del_y) < 1.0:
+            x, y = x + del_x, y + del_y
+            
+        if x**2 + y**2 < 1.0: n_hits += 1
+       
+    return n_hits
+
+n_trials = 10000
+sigma_list500 = []
+sigma_list1000 = []
+delta_list = []
+
+n_runs = 1000
+delta = 0.1
+sigma = 0.0
+
+while delta < 5.0 :
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est500 = 4.0 * markov_pi(n_trials, delta) / float(n_trials)
+        sigma += (pi_est500 - math.pi ) **2
+        
+    sigma_list500.append(math.sqrt(sigma/(n_runs)))
+    delta_list.append(delta)
+    print delta,pi_est500
+    delta += 0.1
+
+
+
+
+pylab.plot(delta_list, sigma_list500,  'o')
+
+pylab.ylabel('RMS error')
+pylab.xlabel('$\delta$')
+pylab.title('RMS vs delta')
+pylab.savefig('markov_pi_multirun_nruns_RMS.png')
+pylab.show()
+
+    
+    
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\rˆê˜Y\Dropbox\Statistical Mechanics Algorithms and Computations\Week1_HW\RMSofpi.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math, pylab
+
+def direct_pi(N):
+    n_hits = 0
+    for i in range(N):
+        x, y = random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0)
+        if x ** 2 + y ** 2 < 1.0:
+            n_hits += 1
+    return n_hits
+
+n_runs = 500
+n_trials_list = []
+sigmas = []
+for poweroftwo in range(0, 10):
+    n_trials = 2 ** poweroftwo
+    sigma = 0.0
+    for run in range(n_runs):
+        pi_est = 4.0 * direct_pi(n_trials) / float(n_trials)
+        sigma += (pi_est - math.pi) ** 2
+    sigmas.append(math.sqrt(sigma/(n_runs)))
+    n_trials_list.append(n_trials)
+
+print sigmas
+print n_trials_list
+
+
+pylab.plot(n_trials_list, sigmas, 'o')
+pylab.gca().set_xscale('log')
+pylab.gca().set_yscale('log')
+pylab.xlabel('n_trials')
+pylab.ylabel('$\sigma$')
+pylab.title('Direct sampling: Standard deviation $\sigma$ as a function of n_trials')
+pylab.savefig('direct_sampling_statistical_error.png')
+pylab.show()

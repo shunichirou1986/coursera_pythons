@@ -1,0 +1,474 @@
+import math
+import random
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+dimension_max = 20
+n_trials = 10000000
+
+print n_trials
+print "dimension |estimation of Vol1_s(d) | Vol1_s(d) (exact)|n_hits"
+for dimension in range(1,dimension_max +1):
+    n_reject = 0
+    for trials in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0,1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept /float(n_trials)
+    if n_accept >0 : print dimension,volume , Vol1_s(dimension),n_accept
+    else:
+        print dimension ,'no sample' , Vol1_s(dimension)
+ 
+    import random, math
+
+def volume_analytic(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+dimension_max = 20
+n_trials = 1000000
+for dimension in range(1, dimension_max + 1):
+    n_reject = 0 
+    for trial in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0, 1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept / float(n_trials)
+    if n_accept > 0:  print dimension , volume, \
+                           volume_analytic(dimension), n_accept
+    else:
+        print dimension , 'no sample', volume_analytic(dimension)import random, math
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+for dimension in range(1,20):
+    print dimension, Vol1_s(dimension)import random, math,pylab
+
+def Vol1_s(radius,dimension):
+    return (radius ** dimension) *math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+vol1_data=[]
+dimension_data=[]
+
+
+for dimension in range(1,200):
+    vol1_data.append(Vol1_s(1,dimension))
+    dimension_data.append(dimension)
+    
+print vol1_data
+
+pylab.gca().set_yscale('log')
+pylab.xlabel('dimension', fontsize=16)
+pylab.ylabel('volume', fontsize=16)
+pylab.plot(dimension_data, vol1_data, linewidth=1.5, color='r')
+pylab.title('The volume of hypersphere for dimension 1-200',fontsize=16)
+pylab.savefig('volume_of_hypersphere_by_dimension1-200.png')
+pylab.show()
+
+print "Vol1_s(5):%s"% Vol1_s(1,5)
+print "Vol1_s(20):%s"% Vol1_s(1,20)
+print "Vol1_s(200):%s"% Vol1_s(1,200)
+py_filenameimport math
+import random
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+dimension_max = 20
+n_trials = 10000000
+
+print n_trials
+print "dimension |estimation of Vol1_s(d) | Vol1_s(d) (exact)|n_hits"
+for dimension in range(1,dimension_max +1):
+    n_reject = 0
+    for trials in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0,1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept /float(n_trials)
+    if n_accept >0 : print dimension,volume , Vol1_s(dimension),n_accept
+    else:
+        print dimension ,'no sample' , Vol1_s(dimension)
+ 
+    py_filenameimport random, math
+
+def volume_analytic(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+dimension_max = 20
+n_trials = 1000000
+for dimension in range(1, dimension_max + 1):
+    n_reject = 0 
+    for trial in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0, 1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept / float(n_trials)
+    if n_accept > 0:  print dimension , volume, \
+                           volume_analytic(dimension), n_accept
+    else:
+        print dimension , 'no sample', volume_analytic(dimension)py_filenameimport random, math
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+for dimension in range(1,20):
+    print dimension, Vol1_s(dimension)py_filenameimport random, math,pylab
+
+def Vol1_s(radius,dimension):
+    return (radius ** dimension) *math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+vol1_data=[]
+dimension_data=[]
+
+
+for dimension in range(1,200):
+    vol1_data.append(Vol1_s(1,dimension))
+    dimension_data.append(dimension)
+    
+print vol1_data
+
+pylab.gca().set_yscale('log')
+pylab.xlabel('dimension', fontsize=16)
+pylab.ylabel('volume', fontsize=16)
+pylab.plot(dimension_data, vol1_data, linewidth=1.5, color='r')
+pylab.title('The volume of hypersphere for dimension 1-200',fontsize=16)
+pylab.savefig('volume_of_hypersphere_by_dimension1-200.png')
+pylab.show()
+
+print "Vol1_s(5):%s"% Vol1_s(1,5)
+print "Vol1_s(20):%s"% Vol1_s(1,20)
+print "Vol1_s(200):%s"% Vol1_s(1,200)
+py_Kugiriimport math
+import random
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+dimension_max = 20
+n_trials = 10000000
+
+print n_trials
+print "dimension |estimation of Vol1_s(d) | Vol1_s(d) (exact)|n_hits"
+for dimension in range(1,dimension_max +1):
+    n_reject = 0
+    for trials in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0,1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept /float(n_trials)
+    if n_accept >0 : print dimension,volume , Vol1_s(dimension),n_accept
+    else:
+        print dimension ,'no sample' , Vol1_s(dimension)
+ 
+    py_Kugiriimport random, math
+
+def volume_analytic(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+dimension_max = 20
+n_trials = 1000000
+for dimension in range(1, dimension_max + 1):
+    n_reject = 0 
+    for trial in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0, 1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept / float(n_trials)
+    if n_accept > 0:  print dimension , volume, \
+                           volume_analytic(dimension), n_accept
+    else:
+        print dimension , 'no sample', volume_analytic(dimension)py_Kugiriimport random, math
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+for dimension in range(1,20):
+    print dimension, Vol1_s(dimension)py_Kugiriimport random, math,pylab
+
+def Vol1_s(radius,dimension):
+    return (radius ** dimension) *math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+vol1_data=[]
+dimension_data=[]
+
+
+for dimension in range(1,200):
+    vol1_data.append(Vol1_s(1,dimension))
+    dimension_data.append(dimension)
+    
+print vol1_data
+
+pylab.gca().set_yscale('log')
+pylab.xlabel('dimension', fontsize=16)
+pylab.ylabel('volume', fontsize=16)
+pylab.plot(dimension_data, vol1_data, linewidth=1.5, color='r')
+pylab.title('The volume of hypersphere for dimension 1-200',fontsize=16)
+pylab.savefig('volume_of_hypersphere_by_dimension1-200.png')
+pylab.show()
+
+print "Vol1_s(5):%s"% Vol1_s(1,5)
+print "Vol1_s(20):%s"% Vol1_s(1,20)
+print "Vol1_s(200):%s"% Vol1_s(1,200)
+py_Kugiriimport math
+import random
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+dimension_max = 20
+n_trials = 10000000
+
+print n_trials
+print "dimension |estimation of Vol1_s(d) | Vol1_s(d) (exact)|n_hits"
+for dimension in range(1,dimension_max +1):
+    n_reject = 0
+    for trials in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0,1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept /float(n_trials)
+    if n_accept >0 : print dimension,volume , Vol1_s(dimension),n_accept
+    else:
+        print dimension ,'no sample' , Vol1_s(dimension)
+ 
+    py_Kugiriimport random, math
+
+def volume_analytic(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+dimension_max = 20
+n_trials = 1000000
+for dimension in range(1, dimension_max + 1):
+    n_reject = 0 
+    for trial in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0, 1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept / float(n_trials)
+    if n_accept > 0:  print dimension , volume, \
+                           volume_analytic(dimension), n_accept
+    else:
+        print dimension , 'no sample', volume_analytic(dimension)py_Kugiriimport random, math
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+for dimension in range(1,20):
+    print dimension, Vol1_s(dimension)py_Kugiriimport random, math,pylab
+
+def Vol1_s(radius,dimension):
+    return (radius ** dimension) *math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+vol1_data=[]
+dimension_data=[]
+
+
+for dimension in range(1,200):
+    vol1_data.append(Vol1_s(1,dimension))
+    dimension_data.append(dimension)
+    
+print vol1_data
+
+pylab.gca().set_yscale('log')
+pylab.xlabel('dimension', fontsize=16)
+pylab.ylabel('volume', fontsize=16)
+pylab.plot(dimension_data, vol1_data, linewidth=1.5, color='r')
+pylab.title('The volume of hypersphere for dimension 1-200',fontsize=16)
+pylab.savefig('volume_of_hypersphere_by_dimension1-200.png')
+pylab.show()
+
+print "Vol1_s(5):%s"% Vol1_s(1,5)
+print "Vol1_s(20):%s"% Vol1_s(1,20)
+print "Vol1_s(200):%s"% Vol1_s(1,200)
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\Week4_HW\B1_direct_sampling_method_for_hyper_sphere_and_hypercube.py@@@@@@@@@@@@@@@@@@@@@@@@import math
+import random
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+dimension_max = 20
+n_trials = 10000000
+
+print n_trials
+print "dimension |estimation of Vol1_s(d) | Vol1_s(d) (exact)|n_hits"
+for dimension in range(1,dimension_max +1):
+    n_reject = 0
+    for trials in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0,1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept /float(n_trials)
+    if n_accept >0 : print dimension,volume , Vol1_s(dimension),n_accept
+    else:
+        print dimension ,'no sample' , Vol1_s(dimension)
+ 
+    @@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\Week4_HW\HW4_B1_Answer.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+def volume_analytic(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+dimension_max = 20
+n_trials = 1000000
+for dimension in range(1, dimension_max + 1):
+    n_reject = 0 
+    for trial in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0, 1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept / float(n_trials)
+    if n_accept > 0:  print dimension , volume, \
+                           volume_analytic(dimension), n_accept
+    else:
+        print dimension , 'no sample', volume_analytic(dimension)@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\Week4_HW\HW4_Preparationprogram.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+for dimension in range(1,20):
+    print dimension, Vol1_s(dimension)@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\Week4_HW\HW4_Preparation_hyperspherevolume.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math,pylab
+
+def Vol1_s(radius,dimension):
+    return (radius ** dimension) *math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+vol1_data=[]
+dimension_data=[]
+
+
+for dimension in range(1,200):
+    vol1_data.append(Vol1_s(1,dimension))
+    dimension_data.append(dimension)
+    
+print vol1_data
+
+pylab.gca().set_yscale('log')
+pylab.xlabel('dimension', fontsize=16)
+pylab.ylabel('volume', fontsize=16)
+pylab.plot(dimension_data, vol1_data, linewidth=1.5, color='r')
+pylab.title('The volume of hypersphere for dimension 1-200',fontsize=16)
+pylab.savefig('volume_of_hypersphere_by_dimension1-200.png')
+pylab.show()
+
+print "Vol1_s(5):%s"% Vol1_s(1,5)
+print "Vol1_s(20):%s"% Vol1_s(1,20)
+print "Vol1_s(200):%s"% Vol1_s(1,200)
+@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\Week4_HW\B1_direct_sampling_method_for_hyper_sphere_and_hypercube.py@@@@@@@@@@@@@@@@@@@@@@@@import math
+import random
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+dimension_max = 20
+n_trials = 10000000
+
+print n_trials
+print "dimension |estimation of Vol1_s(d) | Vol1_s(d) (exact)|n_hits"
+for dimension in range(1,dimension_max +1):
+    n_reject = 0
+    for trials in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0,1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept /float(n_trials)
+    if n_accept >0 : print dimension,volume , Vol1_s(dimension),n_accept
+    else:
+        print dimension ,'no sample' , Vol1_s(dimension)
+ 
+    @@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\Week4_HW\HW4_B1_Answer.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+def volume_analytic(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+dimension_max = 20
+n_trials = 1000000
+for dimension in range(1, dimension_max + 1):
+    n_reject = 0 
+    for trial in range(n_trials):
+        hyperradius_square = 0.0
+        for d in range(dimension):
+            hyperradius_square += random.uniform(-1.0, 1.0) ** 2
+            if hyperradius_square > 1.0:
+                n_reject += 1
+                break
+    n_accept = n_trials - n_reject
+    volume = 2.0 ** dimension * n_accept / float(n_trials)
+    if n_accept > 0:  print dimension , volume, \
+                           volume_analytic(dimension), n_accept
+    else:
+        print dimension , 'no sample', volume_analytic(dimension)@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\Week4_HW\HW4_Preparationprogram.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math
+
+def Vol1_s(dimension):
+    return math.pi ** (dimension / 2.0)/ math.gamma(dimension / 2.0 + 1.0)
+
+for dimension in range(1,20):
+    print dimension, Vol1_s(dimension)@@@@@@@@@@@@@@@@@@@@@@@@C:\Users\èràÍòY\Dropbox\Statistical Mechanics Algorithms and Computations\Week4_HW\HW4_Preparation_hyperspherevolume.py@@@@@@@@@@@@@@@@@@@@@@@@import random, math,pylab
+
+def Vol1_s(radius,dimension):
+    return (radius ** dimension) *math.pi ** (dimension /2.0)/math.gamma(dimension /2.0+1.0)
+
+vol1_data=[]
+dimension_data=[]
+
+
+for dimension in range(1,200):
+    vol1_data.append(Vol1_s(1,dimension))
+    dimension_data.append(dimension)
+    
+print vol1_data
+
+pylab.gca().set_yscale('log')
+pylab.xlabel('dimension', fontsize=16)
+pylab.ylabel('volume', fontsize=16)
+pylab.plot(dimension_data, vol1_data, linewidth=1.5, color='r')
+pylab.title('The volume of hypersphere for dimension 1-200',fontsize=16)
+pylab.savefig('volume_of_hypersphere_by_dimension1-200.png')
+pylab.show()
+
+print "Vol1_s(5):%s"% Vol1_s(1,5)
+print "Vol1_s(20):%s"% Vol1_s(1,20)
+print "Vol1_s(200):%s"% Vol1_s(1,200)
