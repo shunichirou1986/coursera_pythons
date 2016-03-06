@@ -14,5 +14,5 @@ for iter in range(n_trials):
     Obs_sum += Obs
     Obs_square_sum += Obs * Obs
 #Calculate Standard deviation <Obs^2> - <Obs>^2.
-var = math.sqrt((Obs_square_sum/(float(n_trials))-Obs_sum/float(n_trials))*(Obs_sum/float(n_trials)) )
+var = math.sqrt((Obs_square_sum/(float(n_trials))-Obs_sum/float(n_trials)*Obs_sum/float(n_trials)))
 print 4.0 * n_hits / float(n_trials), var
